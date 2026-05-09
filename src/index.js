@@ -1,26 +1,32 @@
 import _ from 'lodash'
 import parseFile from './parsers.js'
+import stylish from './formatters/stylish.js'
+
+const buildDiff = (data1, data2) => {
+  const keys = _.sortBy(_.union(Object.keys(data1), Object.keys(data2)))
+
+  return keys.map((key) => {
+    if (!_.has(data2, key)) {
+      return { key, type: 'removed', value: data1[key] }
+    }
+    if (!_.has(data1, key)) {
+      return { key, type: 'added', value: data2[key] }
+    }
+    if (_.isPlainObject(data1[key]) && _.isPlainObject(data2[key])) {
+      return { key, type: 'nested', children: buildDiff(data1[key], data2[key]) }
+    }
+    if (data1[key] !== data2[key]) {
+      return { key, type: 'changed', oldValue: data1[key], newValue: data2[key] }
+    }
+    return { key, type: 'unchanged', value: data1[key] }
+  })
+}
 
 const genDiff = (filepath1, filepath2) => {
   const data1 = parseFile(filepath1)
   const data2 = parseFile(filepath2)
-
-  const keys = _.sortBy(_.union(Object.keys(data1), Object.keys(data2)))
-
-  const diff = keys.map((key) => {
-    if (!_.has(data2, key)) {
-      return `  - ${key}: ${data1[key]}`
-    }
-    if (!_.has(data1, key)) {
-      return `  + ${key}: ${data2[key]}`
-    }
-    if (data1[key] !== data2[key]) {
-      return `  - ${key}: ${data1[key]}\n  + ${key}: ${data2[key]}`
-    }
-    return `    ${key}: ${data1[key]}`
-  })
-
-  return `{\n${diff.join('\n')}\n}`
+  const diff = buildDiff(data1, data2)
+  return stylish(diff)
 }
 
 export default genDiff
