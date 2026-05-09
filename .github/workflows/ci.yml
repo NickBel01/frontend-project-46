@@ -25,11 +25,9 @@ jobs:
       - name: Run tests with coverage
         run: npx jest --coverage
 
-            - name: SonarCloud Scan
+      - name: SonarCloud Scan
         uses: sonarsource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
-          
-
           
