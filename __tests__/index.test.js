@@ -16,3 +16,11 @@ test('compare flat JSON files', () => {
 
   expect(genDiff(filepath1, filepath2)).toBe(expected)
 })
+
+test('compare flat YAML files', () => {
+  const filepath1 = getFixturePath('file1.yml')
+  const filepath2 = getFixturePath('file2.yml')
+  const expected = readFixture('expected.txt')
+
+  expect(genDiff(filepath1, filepath2)).toBe(expected)
+})

@@ -1,24 +1,25 @@
 import fs from 'fs'
 import path from 'path'
+import yaml from 'js-yaml'
 
-const getAbsolutePath = (filepath) => {
-  if (path.isAbsolute(filepath)) {
-    return filepath
-  }
-  return path.resolve(process.cwd(), filepath)
-}
+const getAbsolutePath = filepath => (
+  path.isAbsolute(filepath) ? filepath : path.resolve(process.cwd(), filepath)
+)
 
-// Функция чтения и парсинга JSON
 const parseFile = (filepath) => {
   const absolutePath = getAbsolutePath(filepath)
-  const fileContent = fs.readFileSync(absolutePath, 'utf-8')
+  const content = fs.readFileSync(absolutePath, 'utf-8')
+  const ext = path.extname(filepath).toLowerCase()
 
-  const extension = path.extname(filepath).toLowerCase()
-  if (extension === '.json') {
-    return JSON.parse(fileContent)
+  switch (ext) {
+    case '.json':
+      return JSON.parse(content)
+    case '.yml':
+    case '.yaml':
+      return yaml.load(content)
+    default:
+      throw new Error(`Unsupported file format: ${ext}`)
   }
-  // Если неизвестный формат  ошибка
-  throw new Error(`Unsupported file format: ${extension}`)
 }
 
 export default parseFile
