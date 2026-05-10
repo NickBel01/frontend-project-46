@@ -24,3 +24,11 @@ test('plain format', () => {
 
   expect(genDiff(filepath1, filepath2, 'plain')).toBe(expected)
 })
+
+test('json format', () => {
+  const filepath1 = getFixturePath('file3.json')
+  const filepath2 = getFixturePath('file4.json')
+  const expected = readFixture('expected_json.txt')
+
+  expect(genDiff(filepath1, filepath2, 'json')).toBe(expected)
+})
